@@ -1,0 +1,65 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Layout from "../../layouts/Layout.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const formatDate = (d: Date) =>
+  d.toISOString().slice(0, 10).replaceAll("-", ".");
+---
+
+<Layout title="Blog">
+  <ul class="list">
+    {posts.map((post) => (
+      <li>
+        <a href={`/blog/${post.id}`}>
+          <Image
+            src={post.data.cover}
+            alt=""
+            widths={[480, 800, 1200]}
+            sizes="(min-width: 900px) 33vw, 50vw"
+            loading="lazy"
+          />
+          <span class="date">{formatDate(post.data.date)}</span>
+          <span class="title">{post.data.title}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Layout>
+
+<style>
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 24px;
+  }
+
+  @media (min-width: 900px) {
+    .list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .list a {
+    display: block;
+  }
+
+  .list img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-bottom: 8px;
+  }
+
+  .date {
+    display: block;
+    color: var(--muted);
+  }
+</style>

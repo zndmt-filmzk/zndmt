@@ -1,0 +1,53 @@
+---
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/photos/*.{jpg,jpeg,JPG,JPEG}",
+  { eager: true }
+);
+
+const photos = Object.entries(modules)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([path, mod]) => ({ path, src: mod.default }));
+---
+
+<Layout>
+  <ul class="grid">
+    {photos.map((photo) => (
+      <li>
+        <Image
+          src={photo.src}
+          alt=""
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 900px) 33vw, 50vw"
+          loading="lazy"
+        />
+      </li>
+    ))}
+  </ul>
+</Layout>
+
+<style>
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    align-items: end;
+  }
+
+  @media (min-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .grid img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

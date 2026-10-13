@@ -1,0 +1,46 @@
+---
+const { pathname } = Astro.url;
+
+const links = [
+  { href: "/", label: "Photo" },
+  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
+];
+
+const isCurrent = (href: string) =>
+  href === "/" ? pathname === "/" : pathname.startsWith(href);
+---
+
+<header>
+  <a href="/" class="site-name">Your Name</a>
+  <nav>
+    {links.map((link) => (
+      <a href={link.href} class:list={[{ current: isCurrent(link.href) }]}>
+        {link.label}
+      </a>
+    ))}
+  </nav>
+</header>
+
+<style>
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 24px;
+  }
+
+  nav {
+    display: flex;
+    gap: 24px;
+  }
+
+  nav a {
+    padding: 8px 0;
+    color: var(--muted);
+  }
+
+  nav a.current {
+    color: var(--fg);
+  }
+</style>
