@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import Layout from "../layouts/Layout.astro";
+import Layout from "../../layouts/Layout.astro";
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
   "../assets/photos/*.{jpg,jpeg,JPG,JPEG}",
