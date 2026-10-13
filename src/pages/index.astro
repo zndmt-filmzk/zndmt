@@ -9,45 +9,62 @@ const modules = import.meta.glob<{ default: ImageMetadata }>(
 
 const photos = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([path, mod]) => ({ path, src: mod.default }));
+  .map(([path, mod]) => ({
+    path,
+    src: mod.default,
+    ratio: mod.default.width / mod.default.height,
+  }));
 ---
 
 <Layout>
   <ul class="grid">
     {photos.map((photo) => (
-      <li>
+      <li style={`--ratio: ${photo.ratio}`}>
         <Image
           src={photo.src}
           alt=""
-          widths={[480, 800, 1200]}
-          sizes="(min-width: 900px) 33vw, 50vw"
+          widths={[480, 800, 1200, 1600]}
+          sizes="(min-width: 900px) 40vw, 60vw"
           loading="lazy"
         />
       </li>
     ))}
+    <li class="filler" aria-hidden="true"></li>
   </ul>
 </Layout>
 
 <style>
   .grid {
+    --row: 140px;
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
   }
 
   @media (min-width: 900px) {
     .grid {
-      grid-template-columns: repeat(3, 1fr);
+      --row: 260px;
+      gap: 24px;
     }
+  }
+
+  .grid li {
+    flex-grow: calc(var(--ratio) * 100);
+    flex-basis: calc(var(--ratio) * var(--row));
   }
 
   .grid img {
     display: block;
     width: 100%;
     height: auto;
+  }
+
+  /* 最後の行だけ、写真が横いっぱいに引き伸ばされないようにする */
+  .grid .filler {
+    flex-grow: 100000;
+    flex-basis: 0;
   }
 </style>
