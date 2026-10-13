@@ -1,0 +1,63 @@
+---
+import Layout from "./Layout.astro";
+
+const { frontmatter } = Astro.props;
+const date = new Date(frontmatter.date)
+  .toISOString()
+  .slice(0, 10)
+  .replaceAll("-", ".");
+---
+
+<Layout title={frontmatter.title}>
+  <article>
+    <h1>{frontmatter.title}</h1>
+    <p class="date">{date}</p>
+    <div class="body">
+      <slot />
+    </div>
+    <p class="back"><a href="/blog">← Blog</a></p>
+  </article>
+</Layout>
+
+<style>
+  article {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin: 24px 0 0;
+  }
+
+  .date {
+    color: var(--muted);
+    margin: 0 0 48px;
+  }
+
+  .body :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 48px 0;
+  }
+
+  .body :global(p) {
+    margin: 0 0 1.5em;
+  }
+
+  .back {
+    margin: 96px 0 0;
+  }
+
+  .back a {
+    display: inline-block;
+    padding: 8px 0;
+    color: var(--muted);
+  }
+
+  .back a:hover {
+    color: var(--fg);
+  }
+</style>

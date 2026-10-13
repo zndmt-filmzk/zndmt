@@ -1,5 +1,6 @@
 ---
 import Header from "../components/Header.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 const { title } = Astro.props;
 const siteName = "zndmt";
 const fullTitle = title ? `${title} | ${siteName}` : siteName;
+const isHome = Astro.url.pathname === "/";
 ---
 
 <!doctype html>
@@ -20,6 +22,7 @@ const fullTitle = title ? `${title} | ${siteName}` : siteName;
   </head>
   <body>
     <Header />
+    {!isHome && <Breadcrumb title={title} />}
     <main>
       <slot />
     </main>

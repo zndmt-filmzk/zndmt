@@ -2,69 +2,76 @@
 import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 
-const modules = import.meta.glob<{ default: ImageMetadata }>(
-  "../assets/photos/*.{jpg,jpeg,JPG,JPEG}",
+const modules = import.meta.glob<any>("./*.md", { eager: true });
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/blog/**/*.{jpg,jpeg,JPG,JPEG}",
   { eager: true }
 );
 
-const photos = Object.entries(modules)
-  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([path, mod]) => ({
-    path,
-    src: mod.default,
-    ratio: mod.default.width / mod.default.height,
-  }));
+const posts = Object.values(modules)
+  .map((post) => ({
+    url: post.url,
+    title: post.frontmatter.title,
+    date: new Date(post.frontmatter.date),
+    cover: images[post.frontmatter.cover]?.default,
+  }))
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+const formatDate = (d: Date) =>
+  d.toISOString().slice(0, 10).replaceAll("-", ".");
 ---
 
-<Layout>
-  <ul class="grid">
-    {photos.map((photo) => (
-      <li style={`--ratio: ${photo.ratio}`}>
-        <Image
-          src={photo.src}
-          alt=""
-          widths={[480, 800, 1200, 1600]}
-          sizes="(min-width: 900px) 40vw, 60vw"
-          loading="lazy"
-        />
+<Layout title="Blog">
+  <ul class="list">
+    {posts.map((post) => (
+      <li>
+        <a href={post.url}>
+          {post.cover && (
+            <Image
+              src={post.cover}
+              alt=""
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 900px) 33vw, 50vw"
+              loading="lazy"
+            />
+          )}
+          <span class="date">{formatDate(post.date)}</span>
+          <span class="title">{post.title}</span>
+        </a>
       </li>
     ))}
-    <li class="filler" aria-hidden="true"></li>
   </ul>
 </Layout>
 
 <style>
-  .grid {
-    --row: 140px;
+  .list {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 24px;
   }
 
   @media (min-width: 900px) {
-    .grid {
-      --row: 260px;
-      gap: 24px;
+    .list {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
-  .grid li {
-    flex-grow: calc(var(--ratio) * 100);
-    flex-basis: calc(var(--ratio) * var(--row));
+  .list a {
+    display: block;
   }
 
-  .grid img {
+  .list img {
     display: block;
     width: 100%;
     height: auto;
+    margin-bottom: 8px;
   }
 
-  /* 最後の行だけ、写真が横いっぱいに引き伸ばされないようにする */
-  .grid .filler {
-    flex-grow: 100000;
-    flex-basis: 0;
+  .date {
+    display: block;
+    color: var(--muted);
   }
 </style>
