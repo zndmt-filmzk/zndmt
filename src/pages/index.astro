@@ -59,13 +59,15 @@ const portrait = await Promise.all(
   .show {
     position: fixed;
     inset: 0;
+    overflow: hidden; /* はみ出し分を隠す */
   }
 
   .layer {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    top: 0;
+    left: 0;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
     object-fit: cover;
     opacity: 0;
     transition: opacity 2s ease;
@@ -78,7 +80,7 @@ const portrait = await Promise.all(
 
 <script>
   // 切り替わる間隔(ミリ秒)。10000 = 10秒
-  const INTERVAL = 10000;
+  const INTERVAL = 15000;
 
   const root = document.querySelector<HTMLElement>(".show");
 

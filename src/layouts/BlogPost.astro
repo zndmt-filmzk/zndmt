@@ -35,10 +35,10 @@ const older =
     </div>
     <nav class="pager" aria-label="前後の記事">
       <div class="prev">
-        {older && <a href={older.url} rel="prev">{`← ${older.title}`}</a>}
+        {newer && <a href={newer.url} rel="next">{`← ${newer.title}`}</a>}
       </div>
       <div class="next">
-        {newer && <a href={newer.url} rel="next">{`${newer.title} →`}</a>}
+        {older && <a href={older.url} rel="prev">{`${older.title} →`}</a>}
       </div>
     </nav>
   </article>
