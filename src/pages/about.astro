@@ -3,16 +3,55 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="About">
-  <p>zndmt</p>
-あんまいうことない
-理系大学生
-写真撮ってます（超初心者）
-この時代にフィルムからカメラ始めたあたおかです
-フィルム使いすぎてお金ありません助けてください
+  <section class="profile">
+    <img
+      class="profile-photo"
+      src="/profile.jpg"
+      alt="zndmtのプロフィール写真"
+    />
 
-音楽もよー聴きます
-ジャズ、フュージョン、ファンクなど好み
-ロック、ハイパーポップもきく
-
+    <div class="profile-text">
+      <h3>zndmt</h3>
+      <p>あんまいうことない</p>
+      <p>理系大学生</p>
+      <p>
+        写真撮ってます（超初心者）<br />
+        この時代にフィルムからカメラ始めたあたおかです<br />
+        フィルム使いすぎてお金ありません助けてください
+      </p>
+      <p>
+        音楽もよー聴きます<br />
+        ジャズ、フュージョン、ファンクなど好み<br />
+        ロック、ハイパーポップもきく
+      </p>
+    </div>
+  </section>
 </Layout>
 
+<style>
+  .profile {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 360px);
+    gap: 2.5rem;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .profile-photo {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .profile-text h1 {
+    margin-top: 0;
+  }
+
+  @media (max-width: 640px) {
+    .profile {
+      grid-template-columns: minmax(0, 280px);
+    }
+  }
+</style>
