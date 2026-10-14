@@ -1,0 +1,55 @@
+<button type="button" id="theme-toggle" aria-label="ライト/ダークを切り替える">
+  <span class="light">Light</span><span class="dark">Dark</span>
+</button>
+
+<script>
+  const root = document.documentElement;
+
+  document.getElementById("theme-toggle")?.addEventListener("click", () => {
+    const isDark = root.dataset.theme
+      ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+
+    const next = isDark ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {}
+  });
+</script>
+
+<style>
+  button {
+    padding: 8px 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: var(--fg);
+  }
+
+  /* 現在のモードを表示する(初期状態はライト) */
+  .dark {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .light {
+      display: none;
+    }
+    :global(:root:not([data-theme="light"])) .dark {
+      display: inline;
+    }
+  }
+
+  :global(:root[data-theme="dark"]) .light {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) .dark {
+    display: inline;
+  }
+</style>

@@ -42,3 +42,30 @@ main {
 ::view-transition-new(root) {
   animation-duration: 0.3s;
 }
+
+:root {
+  color-scheme: light dark;
+  --bg: #fff;
+  --fg: #111;
+  --muted: #888;
+}
+
+/* デバイスがダーク、かつ手動でライトを選んでいない場合 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000;
+    --fg: #eee;
+  }
+}
+
+/* 手動選択 */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000;
+  --fg: #eee;
+}
+
