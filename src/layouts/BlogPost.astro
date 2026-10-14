@@ -6,6 +6,24 @@ const date = new Date(frontmatter.date)
   .toISOString()
   .slice(0, 10)
   .replaceAll("-", ".");
+
+// 全記事を新しい順に並べて、自分の前後を探す
+const modules = import.meta.glob<any>("../pages/blog/*.md", { eager: true });
+const posts = Object.values(modules)
+  .map((post) => ({
+    url: post.url,
+    title: post.frontmatter.title,
+    date: new Date(post.frontmatter.date),
+  }))
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+const normalize = (u: string) => u.replace(/\/$/, "");
+const index = posts.findIndex(
+  (p) => normalize(p.url) === normalize(Astro.url.pathname)
+);
+const newer = index > 0 ? posts[index - 1] : undefined;
+const older =
+  index >= 0 && index < posts.length - 1 ? posts[index + 1] : undefined;
 ---
 
 <Layout title={frontmatter.title}>
@@ -15,7 +33,14 @@ const date = new Date(frontmatter.date)
     <div class="body">
       <slot />
     </div>
-    <p class="back"><a href="/blog">← Blog</a></p>
+    <nav class="pager" aria-label="前後の記事">
+      <div class="prev">
+        {older && <a href={older.url} rel="prev">{`← ${older.title}`}</a>}
+      </div>
+      <div class="next">
+        {newer && <a href={newer.url} rel="next">{`${newer.title} →`}</a>}
+      </div>
+    </nav>
   </article>
 </Layout>
 
@@ -47,17 +72,24 @@ const date = new Date(frontmatter.date)
     margin: 0 0 1.5em;
   }
 
-  .back {
+  .pager {
     margin: 96px 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
   }
 
-  .back a {
+  .pager a {
     display: inline-block;
     padding: 8px 0;
     color: var(--muted);
   }
 
-  .back a:hover {
+  .pager a:hover {
     color: var(--fg);
+  }
+
+  .next {
+    text-align: right;
   }
 </style>
