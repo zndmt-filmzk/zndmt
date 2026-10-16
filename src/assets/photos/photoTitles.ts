@@ -1,6 +1,9 @@
 export const photoTitles: Record<string, string> = {
   "1": "Happy Birthday",
+  "2": "茜色の夕日",
   "3": "icon",
+  "22": "”伊”",
+  "23": "工事",
   "41": "上伊那ぼたん",
   "42": "富嶽",
   "43": "日御碕",
