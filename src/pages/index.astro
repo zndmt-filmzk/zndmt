@@ -24,8 +24,6 @@ const portrait = await Promise.all(
 ---
 
 <Layout>
-  
-  <meta slot="head" name="theme-color" content="#000000" />
   <div
     class="show"
     data-landscape={JSON.stringify(landscape)}
@@ -37,11 +35,23 @@ const portrait = await Promise.all(
 </Layout>
 
 <style is:global>
-html,
+  html,
   body {
-  margin: 0;
+    margin: 0;
     height: 100%;
     overflow: hidden;
+  }
+
+  /* バーの領域に出る html 自体にも画像を表示する */
+  html {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* global.css の body { background: var(--bg) } が html の背景を隠さないようにする */
+  html body {
+    background: transparent;
   }
 
   header {
@@ -60,10 +70,11 @@ html,
 <style>
   .show {
     position: fixed;
-    top: -200px;
-    bottom: -200px;
+    top: 0;
     left: 0;
-    right: 0;
+    width: 100%;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
     overflow: hidden;
   }
 
@@ -110,6 +121,8 @@ html,
 
     const setImage = (el: HTMLElement, src: string) => {
       el.style.backgroundImage = `url("${src}")`;
+      // バー領域に出る html の背景も同じ画像にする
+      document.documentElement.style.backgroundImage = `url("${src}")`;
     };
 
     const start = () => {
