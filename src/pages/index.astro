@@ -64,13 +64,14 @@ const portrait = await Promise.all(
 </style>
 
 <style>
+  /* 画面の上下に 120px ずつはみ出させて、バーの裏側まで確実に写真で覆う。
+     はみ出し分は画面外なので見えない(html の overflow: hidden で切れる) */
   .show {
     position: fixed;
-    top: 0;
+    top: -120px;
+    bottom: -120px;
     left: 0;
-    width: 100%;
-    height: 100vh; /* フォールバック */
-    height: 100lvh;
+    right: 0;
     overflow: hidden;
   }
 
