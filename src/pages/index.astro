@@ -42,12 +42,16 @@ const portrait = await Promise.all(
     overflow: hidden;
   }
 
-  /* iOS 26 Safari は body の背景色で上下バーの色を決める。
-     写真の平均色(--tint)をここに入れて、バーを写真に馴染ませる */
-  html,
+  /* バーの領域に出る html 自体にも画像を表示する */
+  html {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* global.css の body { background: var(--bg) } が html の背景を隠さないようにする */
   html body {
-    background-color: var(--tint, #000);
-    transition: background-color 2s ease;
+    background: transparent;
   }
 
   header {
@@ -117,37 +121,8 @@ const portrait = await Promise.all(
 
     const setImage = (el: HTMLElement, src: string) => {
       el.style.backgroundImage = `url("${src}")`;
-    };
-
-    // 写真の平均色を求めて、背景色(--tint)に設定する
-    const tint = (src: string) => {
-      const img = new Image();
-      img.onload = () => {
-        try {
-          const size = 8;
-          const canvas = document.createElement("canvas");
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
-          ctx.drawImage(img, 0, 0, size, size);
-          const data = ctx.getImageData(0, 0, size, size).data;
-          let r = 0;
-          let g = 0;
-          let b = 0;
-          const n = data.length / 4;
-          for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-          }
-          document.documentElement.style.setProperty(
-            "--tint",
-            `rgb(${Math.round(r / n)}, ${Math.round(g / n)}, ${Math.round(b / n)})`
-          );
-        } catch {}
-      };
-      img.src = src;
+      // バー領域に出る html の背景も同じ画像にする
+      document.documentElement.style.backgroundImage = `url("${src}")`;
     };
 
     const start = () => {
@@ -165,7 +140,6 @@ const portrait = await Promise.all(
 
       setImage(layers[0], order[0]);
       layers[0].classList.add("visible");
-      tint(order[0]);
 
       if (order.length > 1) {
         timer = window.setInterval(() => {
@@ -176,7 +150,6 @@ const portrait = await Promise.all(
             setImage(layers[back], order[next]);
             layers[front].classList.remove("visible");
             layers[back].classList.add("visible");
-            tint(order[next]);
             front = back;
             current = next;
           };
