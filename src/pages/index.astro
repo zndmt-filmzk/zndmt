@@ -35,21 +35,22 @@ const portrait = await Promise.all(
 </Layout>
 
 <style is:global>
-  /* overflow: hidden を外す。これが原因で Safari が描画範囲を
-     バーの内側に切っている可能性がある */
   html,
   body {
     margin: 0;
-    min-height: 100vh; /* フォールバック */
-    min-height: 100lvh;
-    overscroll-behavior: none;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
+    overflow: hidden;
   }
 
-  /* iOS 26 Safari は body の背景色で上下バーの色を決める。
-     写真の平均色(--tint)をここに入れて、バーを写真に馴染ませる */
-  html,
-  html body {
+  /* iOS Safari は上下バーの裏に html の背景だけを描く。
+     そこに写真も入れて、バーの裏まで写真で埋める。
+     写真が読み込まれるまでは平均色(--tint)が見える */
+  html {
     background-color: var(--tint, #000);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     transition: background-color 2s ease;
   }
 
@@ -67,22 +68,27 @@ const portrait = await Promise.all(
 </style>
 
 <style>
-  /* 上下に大きくはみ出させて、バーの裏まで写真を届かせる */
   .show {
     position: fixed;
-    top: -200px;
-    bottom: -200px;
+    top: 0;
     left: 0;
-    right: 0;
+    width: 100%;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
     overflow: hidden;
   }
 
   .layer {
+    /* 写真の拡大率(html の背景と揃えるため 1 のまま推奨) */
+    --zoom: 1;
+
     position: absolute;
     inset: 0;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    transform: scale(var(--zoom));
+    transform-origin: center;
     opacity: 0;
     transition: opacity 2s ease;
   }
@@ -95,6 +101,8 @@ const portrait = await Promise.all(
 <script>
   // 切り替わる間隔(ミリ秒)。15000 = 15秒
   const INTERVAL = 15000;
+  // フェードにかかる時間(ミリ秒)。CSS の transition (2s) と合わせる
+  const FADE = 2000;
 
   const root = document.querySelector<HTMLElement>(".show");
 
@@ -105,6 +113,7 @@ const portrait = await Promise.all(
     const media = window.matchMedia("(max-aspect-ratio: 1/1)");
 
     let timer: number | undefined;
+    let backdropTimer: number | undefined;
 
     const shuffle = (list: string[]) => {
       const a = [...list];
@@ -117,6 +126,11 @@ const portrait = await Promise.all(
 
     const setImage = (el: HTMLElement, src: string) => {
       el.style.backgroundImage = `url("${src}")`;
+    };
+
+    // html の背景(バーの裏まで届く部分)にも写真を設定する
+    const setBackdrop = (src: string) => {
+      document.documentElement.style.backgroundImage = `url("${src}")`;
     };
 
     // 写真の平均色を求めて、背景色(--tint)に設定する
@@ -152,6 +166,7 @@ const portrait = await Promise.all(
 
     const start = () => {
       window.clearInterval(timer);
+      window.clearTimeout(backdropTimer);
       layers.forEach((l) => l.classList.remove("visible"));
 
       // 縦長の画面なら縦長の写真、横長の画面なら横長の写真。なければもう片方を使う
@@ -164,6 +179,7 @@ const portrait = await Promise.all(
       let front = 0;
 
       setImage(layers[0], order[0]);
+      setBackdrop(order[0]);
       layers[0].classList.add("visible");
       tint(order[0]);
 
@@ -179,6 +195,9 @@ const portrait = await Promise.all(
             tint(order[next]);
             front = back;
             current = next;
+            // フェードが終わってから html 背景も新しい写真に切り替える
+            window.clearTimeout(backdropTimer);
+            backdropTimer = window.setTimeout(() => setBackdrop(order[next]), FADE);
           };
           pre.src = order[next];
         }, INTERVAL);
