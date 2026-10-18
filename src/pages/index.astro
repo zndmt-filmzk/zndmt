@@ -43,6 +43,11 @@ const portrait = await Promise.all(
     overflow: hidden;
   }
 
+  /* このページでは main の余白を消す */
+  main {
+    padding: 0;
+  }
+
   header {
     position: fixed;
     top: 0;
@@ -54,33 +59,37 @@ const portrait = await Promise.all(
     --fg: #fff;
     --muted: #fff;
   }
-</style>
 
-<style>
-  /* 画面の四辺に固定し、上下はバー(セーフエリア)の分だけ外側まで広げる */
+  /* 写真の枠。body 直下に移して使う */
   .show {
     position: fixed;
-    top: calc(env(safe-area-inset-top, 0px) * -1);
-    bottom: calc(env(safe-area-inset-bottom, 0px) * -1);
+    top: 0;
     left: 0;
-    right: 0;
+    width: 100vw;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
     overflow: hidden;
     z-index: 0;
   }
 
-  /* img + object-fit: cover で、枠いっぱいに写真を拡大して埋める */
-  .layer {
+  .show .layer {
+    /* ★ ここの数字で写真の拡大率を調整(2 = 200%) */
+    --zoom: 2;
+
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    /* 枠の --zoom 倍の大きさにして、中央に配置する */
+    width: calc(100% * var(--zoom));
+    height: calc(100% * var(--zoom));
+    left: calc((1 - var(--zoom)) * 50%);
+    top: calc((1 - var(--zoom)) * 50%);
+    max-width: none;
     object-fit: cover;
     object-position: center;
     opacity: 0;
     transition: opacity 2s ease;
   }
 
-  .layer.visible {
+  .show .layer.visible {
     opacity: 1;
   }
 </style>
@@ -92,6 +101,9 @@ const portrait = await Promise.all(
   const root = document.querySelector<HTMLElement>(".show");
 
   if (root) {
+    // main の外(body 直下)に移して、祖先の影響を受けないようにする
+    document.body.appendChild(root);
+
     const landscape: string[] = JSON.parse(root.dataset.landscape ?? "[]");
     const portrait: string[] = JSON.parse(root.dataset.portrait ?? "[]");
     const layers = Array.from(root.querySelectorAll<HTMLImageElement>(".layer"));
