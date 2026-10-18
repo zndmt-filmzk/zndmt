@@ -29,28 +29,18 @@ const portrait = await Promise.all(
     data-landscape={JSON.stringify(landscape)}
     data-portrait={JSON.stringify(portrait)}
   >
-    <div class="layer"></div>
-    <div class="layer"></div>
+    <img class="layer" alt="" />
+    <img class="layer" alt="" />
   </div>
 </Layout>
 
 <style is:global>
-  /* overflow: hidden を外す。これが原因で Safari が描画範囲を
-     バーの内側に切っている可能性がある */
   html,
   body {
     margin: 0;
-    min-height: 100vh; /* フォールバック */
-    min-height: 100lvh;
-    overscroll-behavior: none;
-  }
-
-  /* iOS 26 Safari は body の背景色で上下バーの色を決める。
-     写真の平均色(--tint)をここに入れて、バーを写真に馴染ませる */
-  html,
-  html body {
-    background-color: var(--tint, #000);
-    transition: background-color 2s ease;
+    padding: 0;
+    background: #000;
+    overflow: hidden;
   }
 
   header {
@@ -67,22 +57,25 @@ const portrait = await Promise.all(
 </style>
 
 <style>
-  /* 上下に大きくはみ出させて、バーの裏まで写真を届かせる */
+  /* 画面の四辺に固定し、上下はバー(セーフエリア)の分だけ外側まで広げる */
   .show {
     position: fixed;
-    top: -200px;
-    bottom: -200px;
+    top: calc(env(safe-area-inset-top, 0px) * -1);
+    bottom: calc(env(safe-area-inset-bottom, 0px) * -1);
     left: 0;
     right: 0;
     overflow: hidden;
+    z-index: 0;
   }
 
+  /* img + object-fit: cover で、枠いっぱいに写真を拡大して埋める */
   .layer {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     opacity: 0;
     transition: opacity 2s ease;
   }
@@ -101,7 +94,7 @@ const portrait = await Promise.all(
   if (root) {
     const landscape: string[] = JSON.parse(root.dataset.landscape ?? "[]");
     const portrait: string[] = JSON.parse(root.dataset.portrait ?? "[]");
-    const layers = Array.from(root.querySelectorAll<HTMLElement>(".layer"));
+    const layers = Array.from(root.querySelectorAll<HTMLImageElement>(".layer"));
     const media = window.matchMedia("(max-aspect-ratio: 1/1)");
 
     let timer: number | undefined;
@@ -113,41 +106,6 @@ const portrait = await Promise.all(
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
-    };
-
-    const setImage = (el: HTMLElement, src: string) => {
-      el.style.backgroundImage = `url("${src}")`;
-    };
-
-    // 写真の平均色を求めて、背景色(--tint)に設定する
-    const tint = (src: string) => {
-      const img = new Image();
-      img.onload = () => {
-        try {
-          const size = 8;
-          const canvas = document.createElement("canvas");
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
-          ctx.drawImage(img, 0, 0, size, size);
-          const data = ctx.getImageData(0, 0, size, size).data;
-          let r = 0;
-          let g = 0;
-          let b = 0;
-          const n = data.length / 4;
-          for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-          }
-          document.documentElement.style.setProperty(
-            "--tint",
-            `rgb(${Math.round(r / n)}, ${Math.round(g / n)}, ${Math.round(b / n)})`
-          );
-        } catch {}
-      };
-      img.src = src;
     };
 
     const start = () => {
@@ -163,9 +121,8 @@ const portrait = await Promise.all(
       let current = 0;
       let front = 0;
 
-      setImage(layers[0], order[0]);
+      layers[0].src = order[0];
       layers[0].classList.add("visible");
-      tint(order[0]);
 
       if (order.length > 1) {
         timer = window.setInterval(() => {
@@ -173,10 +130,9 @@ const portrait = await Promise.all(
           const back = 1 - front;
           const pre = new Image();
           pre.onload = () => {
-            setImage(layers[back], order[next]);
+            layers[back].src = order[next];
             layers[front].classList.remove("visible");
             layers[back].classList.add("visible");
-            tint(order[next]);
             front = back;
             current = next;
           };
