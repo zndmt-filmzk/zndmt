@@ -39,6 +39,7 @@ const portrait = await Promise.all(
   body {
     margin: 0;
     height: 100%;
+    min-height: 100lvh;
     overflow: hidden;
   }
 
@@ -64,23 +65,24 @@ const portrait = await Promise.all(
 </style>
 
 <style>
-  /* 画面の上下に 120px ずつはみ出させて、バーの裏側まで確実に写真で覆う。
-     はみ出し分は画面外なので見えない(html の overflow: hidden で切れる) */
   .show {
     position: fixed;
-    top: -120px;
-    bottom: -120px;
-    left: 0;
-    right: 0;
-    overflow: hidden;
-  }
-
-  .layer {
-    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
+    overflow: hidden;
+  }
+
+  /* 写真を画面より大きく描画する(上下左右に15%ずつはみ出す)。
+     大きくした分 cover で拡大されるので、端まで写真で埋まる */
+  .layer {
+    position: absolute;
+    top: -15%;
+    left: -15%;
+    width: 130%;
+    height: 130%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
