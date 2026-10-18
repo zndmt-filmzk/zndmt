@@ -39,7 +39,6 @@ const portrait = await Promise.all(
   body {
     margin: 0;
     padding: 0;
-    height: 100%; /* ★追加 */
     background: #000;
     overflow: hidden;
   }
@@ -64,9 +63,11 @@ const portrait = await Promise.all(
   /* 写真の枠。body 直下に移して使う */
   .show {
     position: fixed;
-    inset: 0; /* ★変更: 上下左右すべて0で画面全体に固定 */
-    width: 100%; /* ★変更: vw/vh/lvh をやめた */
-    height: 100%;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
     overflow: hidden;
     z-index: 0;
   }
