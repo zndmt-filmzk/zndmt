@@ -75,17 +75,17 @@ const portrait = await Promise.all(
     overflow: hidden;
   }
 
-  /* 写真を画面より大きく描画する(上下左右に15%ずつはみ出す)。
-     大きくした分 cover で拡大されるので、端まで写真で埋まる */
   .layer {
+    /* ★ ここの数字で写真の拡大率を調整(1.6 = 160%) */
+    --zoom: 1.6;
+
     position: absolute;
-    top: -15%;
-    left: -15%;
-    width: 130%;
-    height: 130%;
+    inset: 0;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    transform: scale(var(--zoom));
+    transform-origin: center;
     opacity: 0;
     transition: opacity 2s ease;
   }
