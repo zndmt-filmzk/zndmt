@@ -59,10 +59,11 @@ const portrait = await Promise.all(
 <style>
   .show {
     position: fixed;
-    top: -200px;
-    bottom: -200px;
+    top: 0;
     left: 0;
-    right: 0;
+    width: 100%;
+    height: 100vh; /* フォールバック */
+    height: 100lvh;
     overflow: hidden;
   }
 
