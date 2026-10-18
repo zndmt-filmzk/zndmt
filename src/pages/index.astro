@@ -35,7 +35,11 @@ const portrait = await Promise.all(
 </Layout>
 
 <style is:global>
-   body {
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    background: #000; /* 万一隙間が出ても目立たないように */
     overflow: hidden;
   }
 
@@ -55,7 +59,11 @@ const portrait = await Promise.all(
 <style>
   .show {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; /* 古いブラウザ用フォールバック */
+    height: 100lvh; /* アドレスバーが引っ込んだ状態の最大高さ */
     overflow: hidden; /* はみ出し分を隠す */
   }
 
@@ -63,9 +71,10 @@ const portrait = await Promise.all(
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100% + 2px);
-    height: calc(100% + 2px);
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 余白なしで全面を埋める(はみ出し分はトリミング) */
+    object-position: center;
     opacity: 0;
     transition: opacity 2s ease;
   }
@@ -76,7 +85,7 @@ const portrait = await Promise.all(
 </style>
 
 <script>
-  // 切り替わる間隔(ミリ秒)。10000 = 10秒
+  // 切り替わる間隔(ミリ秒)。15000 = 15秒
   const INTERVAL = 15000;
 
   const root = document.querySelector<HTMLElement>(".show");
