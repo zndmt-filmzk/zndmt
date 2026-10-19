@@ -50,7 +50,6 @@ const photos = await Promise.all(
         </button>
       </li>
     ))}
-    <li class="filler" aria-hidden="true"></li>
   </ul>
 
   <div id="lb" class="lb" role="dialog" aria-modal="true" aria-label="写真の拡大表示" aria-hidden="true">
@@ -212,11 +211,6 @@ const photos = await Promise.all(
     height: auto;
   }
 
-  .grid .filler {
-    flex-grow: 100000;
-    flex-basis: 0;
-  }
-
   /* ---- Lightbox ---- */
   .lb {
     position: fixed;
@@ -228,7 +222,6 @@ const photos = await Promise.all(
     background: color-mix(in srgb, var(--bg) 97%, transparent);
     color: var(--fg);
     cursor: zoom-out;
-    /* 以下は変更なし */
 
     /* 背景は先にふわっと */
     opacity: 0;
